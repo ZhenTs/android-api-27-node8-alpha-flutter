@@ -1,29 +1,39 @@
-FROM circleci:android:api-27-node8-alpha
+FROM circleci/android:api-27-node8-alpha
 
 # Flutter
-ENV FLUTTER_ROOT="/usr/local/flutter"
-ENV FLUTTER_SDK_ARCHIVE="/tmp/flutter.tar.xz"
-ENV FLUTTER_SDK_URL="https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_1.22.0-stable.tar.xz"
-RUN curl --output "${FLUTTER_SDK_ARCHIVE}" --url "${FLUTTER_SDK_URL}" \
-  && tar --extract --file="${FLUTTER_SDK_ARCHIVE}" --directory=$(dirname ${FLUTTER_ROOT}) \
+
+
+ENV FLUTTER_ROOT="/home/circleci/flutter"
+ENV FLUTTER_SDK_ARCHIVE="/home/circleci/flutter.tar.xz"
+ENV FLUTTER_SDK_URL="https://storage.flutter-io.cn/flutter_infra/releases/stable/linux/flutter_linux_1.20.0-stable.tar.xz"
+#ENV FLUTTER_SDK_URL="https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_1.20.0-stable.tar.xz"
+#RUN sudo curl --output "${FLUTTER_SDK_ARCHIVE}" --url "${FLUTTER_SDK_URL}" \
+#  && tar --extract --file="${FLUTTER_SDK_ARCHIVE}" --directory=$(dirname ${FLUTTER_ROOT}) \
+#  && rm "${FLUTTER_SDK_ARCHIVE}"
+
+
+COPY ./flutter_linux_1.20.0-stable.tar.xz "${FLUTTER_SDK_ARCHIVE}"
+
+RUN tar --extract --file="${FLUTTER_SDK_ARCHIVE}" --directory=/home/circleci/ \
   && rm "${FLUTTER_SDK_ARCHIVE}"
 
+#RUN sudo chmod -R 777 "${FLUTTER_ROOT}/*"
 # Dependencies
 ENV LANG en_US.UTF-8
-RUN apt-get update -y \
-# Install basics
-  && apt-get install -y --no-install-recommends \
-  # zip \
-  locales \
-  libstdc++6 \
-  lib32stdc++6 \
-  libglu1-mesa \
-  build-essential \
-# Clean up image
-  && locale-gen en_US ${LANG} \
-  && dpkg-reconfigure locales \
-  && apt-get autoremove -y \
-  && rm -rf /var/lib/apt/lists/*
+#RUN sudo apt-get update -y \
+## Install basics
+#  && sudo apt-get install -y --no-install-recommends \
+#  # zip \
+#  locales \
+#  libstdc++6 \
+#  lib32stdc++6 \
+#  libglu1-mesa \
+#  build-essential \
+## Clean up image
+#  && sudo locale-gen en_US ${LANG} \
+#  && sudo dpkg-reconfigure locales \
+#  && sudo apt-get autoremove -y \
+#  && sudo rm -rf /var/lib/apt/lists/*
 
 RUN yes "y" | ${FLUTTER_ROOT}/bin/flutter doctor --android-licenses \
   && ${FLUTTER_ROOT}/bin/flutter doctor
